@@ -1,11 +1,28 @@
-import task_answer
-from skysmart_api import SkySmartApi
+import sqlite3
+from skysmart.skysmart_api import SkySmartApi
 from secret import token
+from aiogram import executor, types
+from skysmarthack.loader import dp
+from skysmarthack.bot_commands import set_default_commands
+import aiogram
+
 #в переменной token находится токен от вашего аккаунта в SkySmart
 
-SSApi = SkySmartApi(token)
-AnsBody = task_answer.TaskAnswerObject("nexemiduke")
 
-# print(tid := SSApi.get_tasks("nexemiduke"))
-# print(SSApi.get_task_content('58274ae8-b358-4059-9ebd-c175f165dde5'))
-print(AnsBody.get_task_answer(SSApi.get_task_content('58274ae8-b358-4059-9ebd-c175f165dde5')))
+SSApi = SkySmartApi(token)
+
+#Подключение к базе данных
+bot_db = sqlite3.connect("bot.db")
+cursor = bot_db.cursor()
+
+#Подключение к боту Telegram
+async def on_startup(dispatcher):
+    print("БОТ ПОДКЛЮЧЕН К TELEGRAM API УСПЕШНО!")
+    await set_default_commands(dispatcher)
+
+@dp.message_handler(commands=["start"])
+async def start(message: types.Message):
+    await message.answer("Отвечу на любой тест уже скоро!")
+
+if __name__ == "__main__":
+    executor.start_polling(dp, on_startup=on_startup)

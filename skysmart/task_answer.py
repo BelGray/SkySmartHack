@@ -1,6 +1,5 @@
-from skysmart_api import SkySmartApi
+from skysmart.skysmart_api import SkySmartApi
 from secret import token
-import requests
 from bs4 import BeautifulSoup
 import base64
 
