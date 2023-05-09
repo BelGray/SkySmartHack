@@ -13,7 +13,7 @@ def isValidPromo(promo):
                 item_id = promo_parts[2]
                 cursor.execute(f"SELECT * FROM promo WHERE id = '{int(id),}' AND body = '{str(body)}' AND item_id = '{int(item_id),}'")
                 result = cursor.fetchone()
-                if result:
+                if result and result[4] > 0:
                     function(*args, **kwargs)
                     return True
                 if not result:
