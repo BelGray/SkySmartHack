@@ -2,15 +2,13 @@ import sqlite3
 from systems import promocode
 from database.sql_configs import cursor, bot_db
 from skysmart.skysmart_api import SkySmartApi
-from secret import token
+from secret import skysmart_token
 from aiogram import executor, types
 from skysmarthack.loader import dp
 from skysmarthack.bot_commands import set_default_commands
 
-#в переменной token находится токен от вашего аккаунта в SkySmart
-
 default_task_url = "edu.skysmart.ru/student/"
-SSApi = SkySmartApi(token)
+SSApi = SkySmartApi(skysmart_token)
 
 #Подключение к Telegram API
 async def on_startup(dispatcher):

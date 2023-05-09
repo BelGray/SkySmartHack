@@ -14,7 +14,7 @@ def userRegister(user_telegram_id) -> bool:
             '{str(user_telegram_id,)}',
             '{0}',
             '0',
-            '{5}'
+            '{2}'
             )
             """)
           bot_db.commit()

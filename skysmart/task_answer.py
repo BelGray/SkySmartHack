@@ -1,9 +1,9 @@
 from skysmart.skysmart_api import SkySmartApi
-from secret import token
+from secret import skysmart_token
 from bs4 import BeautifulSoup
 import base64
 
-SSApi = SkySmartApi(token)
+SSApi = SkySmartApi(skysmart_token)
 
 
 def remove_linebreaks(string: str) -> str:
