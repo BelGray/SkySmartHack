@@ -3,6 +3,7 @@ from database.sql_configs import cursor, bot_db
 
 
 def isValidPromo(promo):
+    """Проверить, существует ли введенный промокод"""
     def function_wrapper(function):
         def wrapper(*args, **kwargs):
             if "-" in promo and promo.count("-") == 2:

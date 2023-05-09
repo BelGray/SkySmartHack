@@ -11,11 +11,11 @@ def remove_linebreaks(string: str) -> str:
         string = string.replace('\n\n', '\n')
     return string.strip()
 class TaskAnswerObject:
-    task_hash: str
     def __init__(self, task_hash):
         self.task_hash = task_hash
 
     def get_answers(self):
+        """Получить все ответы на задания из теста"""
         answers = []
         tasks_len = 0
         tasks_uuid = SSApi.get_tasks(self.task_hash)
@@ -26,10 +26,12 @@ class TaskAnswerObject:
         return answers
 
     def get_task_question(self, soup):
+        """Получить вопрос из задания в тесте"""
         return soup.find('vim-instruction').text.strip()
 
 
     def get_full_question(self, soup):
+        """Получить всё задание (вопрос, картинки и так далее...)"""
         elements = soup.find_all(
             ['vim-instruction', 'vim-groups', 'vim-test-item', 'vim-order-sentence-verify-item', 'vim-input-answers',
              'vim-select-item', 'vim-test-image-item', 'math-input-answer', 'vim-dnd-text-drop', 'vim-dnd-group-drag',
@@ -40,6 +42,7 @@ class TaskAnswerObject:
         return remove_linebreaks(soup.text)
 
     def get_task_answer(self, soup) -> dict:
+        """Получить ответ на отдельное задание из теста"""
         answers = []
         soup = BeautifulSoup(soup, 'html.parser')
 

@@ -4,10 +4,8 @@ import user_agent as u_ag
 class SkySmartApi:
 
     base_url = "https://api-edu.skysmart.ru/api/v1/"
-    bearer_token: str
 
     def __init__(self, bearer_token):
-        """SkySmartApi class constructor"""
         self.bearer_token = bearer_token
 
     def headers(self):
