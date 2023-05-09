@@ -16,7 +16,7 @@ def isValidPromo(promo):
                 if result and result[4] > 0:
                     function(*args, **kwargs)
                     return True
-                if not result:
+                if not result or result[4] <= 0:
                     return False
 
         return wrapper
