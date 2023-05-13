@@ -7,7 +7,6 @@ from aiogram import executor, types
 from skysmarthack.loader import dp
 from skysmarthack.bot_commands import set_default_commands
 
-default_task_url = "edu.skysmart.ru/student/"
 SSApi = SkySmartApi(skysmart_token)
 
 #Подключение к Telegram API
@@ -45,8 +44,7 @@ async def start(message: types.Message):
 
 @dp.message_handler()
 async def message_handler(message: types.Message):
-    if default_task_url in message["text"]:
-        pass
+    pass
 
 if __name__ == "__main__":
     executor.start_polling(dp, on_startup=on_startup)
