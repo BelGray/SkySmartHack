@@ -4,6 +4,7 @@ import user_agent as u_ag
 class SkySmartApi:
 
     base_url = "https://api-edu.skysmart.ru/api/v1/"
+    default_task_url = ["https://edu.skysmart.ru/student/", "https://edu.skysmart.ru/student/task/"]
 
     def __init__(self, bearer_token):
         self.bearer_token = bearer_token
@@ -38,3 +39,18 @@ class SkySmartApi:
         headers = self.headers()
         get_task_content_request = requests.get(self.base_url + "content/step/load?stepUuid="+task_uuid, headers=headers).json()
         return get_task_content_request["content"]
+
+    def cut_hash(self, message_content: str) -> tuple:
+        """Получить уникальное значение теста из URL"""
+        if message_content.startswith(self.default_task_url[1]):
+            split_list = message_content.split("/")
+            hash = split_list[5]
+            return True, hash
+        if message_content.startswith(self.default_task_url[0]):
+            split_list = message_content.split("/")
+            hash = split_list[4]
+            return True, hash
+        else:
+            return False, None
+
+
