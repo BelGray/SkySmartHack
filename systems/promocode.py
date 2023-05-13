@@ -50,7 +50,20 @@ class alreadyExistsPromo:
             self.promo = str(promo)
             self.author_telegram_id = str(author_telegram_id)
             self.use_promo = systems.decorators.isValidPromo(self.promo)(self.use_promo)
-
+        def delete_promo(self, id: int) -> bool:
+            """Удалить промокод из базы данных"""
+            cursor.execute(f"""SELECT * FROM promo WHERE id = {id,}""")
+            result = cursor.fetchone()
+            if result:
+                try:
+                    cursor.execute(f"""DELETE FROM promo WHERE id = {id,}""")
+                    bot_db.commit()
+                    return True
+                except Exception as e:
+                    print(e)
+                    return False
+            else:
+                return False
         def use_promo(self) -> bool:
             """Использовать промокод"""
             promo_parts = self.promo.split("-")
