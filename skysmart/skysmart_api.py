@@ -45,10 +45,16 @@ class SkySmartApi:
         if message_content.startswith(self.default_task_url[1]):
             split_list = message_content.split("/")
             hash = split_list[5]
+            if '%' in hash:
+                splitting = hash.split('%')
+                hash = splitting[0]
             return True, hash
         if message_content.startswith(self.default_task_url[0]):
             split_list = message_content.split("/")
             hash = split_list[4]
+            if '%' in hash:
+                splitting = hash.split('%')
+                hash = splitting[0]
             return True, hash
         else:
             return False, None
