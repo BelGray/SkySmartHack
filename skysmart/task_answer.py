@@ -41,10 +41,9 @@ class TaskAnswerObject:
             element.extract()
         return remove_linebreaks(soup.text)
 
-    def get_task_answer(self, soup) -> dict:
+    def get_task_answer(self, soup, count) -> dict:
         """Получить ответ на отдельное задание из теста"""
         answers = []
-        soup = BeautifulSoup(soup, 'html.parser')
 
         if soup.find('vim-test-item', attrs={'correct': 'true'}):
             for i in soup.find_all('vim-test-item', attrs={'correct': 'true'}):
@@ -64,7 +63,7 @@ class TaskAnswerObject:
 
         if soup.find('vim-test-image-item', attrs={'correct': 'true'}):
             for i in soup.find_all('vim-test-image-item', attrs={'correct': 'true'}):
-                answers.append(f'{i.text} - Верный')
+                answers.append(f'{i.text} - ✔️')
 
         if soup.find('math-input-answer'):
             for i in soup.find_all('math-input-answer'):
@@ -74,7 +73,7 @@ class TaskAnswerObject:
             for i in soup.find_all('vim-dnd-text-drop'):
                 for f in soup.find_all('vim-dnd-text-drag'):
                     if i['drag-ids'] == f['answer-id']:
-                        answers.append(f'{f.text}')
+                        answers.append(f'{i.text} - {f.text}')
 
         if soup.find('vim-dnd-group-drag'):
             for i in soup.find_all('vim-dnd-group-drag'):
@@ -87,12 +86,22 @@ class TaskAnswerObject:
                 for l in i.find_all('vim-groups-item'):
                     try:
                         answers.append(f"{base64.b64decode(l['text']).decode('utf-8')}")
-                    except:
-                        pass
+
+                    except Exception as e:
+                        print(e)
+            else:
+                answers = [' - '.join(answers[i:i+2]) for i in range(0, len(answers), 2)]
+                new_answers_list = []
+                for element in answers:
+                    current_element = str(element) + '\n'
+                    new_answers_list.append(current_element)
+                else:
+                    answers = new_answers_list
 
         if soup.find('vim-strike-out-item'):
             for i in soup.find_all('vim-strike-out-item', attrs={'striked': 'true'}):
                 answers.append(i.text)
+
 
         if soup.find('vim-dnd-image-set-drag'):
             for i in soup.find_all('vim-dnd-image-set-drag'):
@@ -106,8 +115,9 @@ class TaskAnswerObject:
                     if i['answer-id'] in f['drag-ids']:
                         answers.append(f'{f.text} - {i.text}')
 
+
         if soup.find('edu-open-answer', attrs={'id': 'OA1'}):
-            answers.append('Необходимо загрузить файл')
+            answers.append('Требуется загрузить файл')
 
         return {
             'question': self.get_task_question(soup),
