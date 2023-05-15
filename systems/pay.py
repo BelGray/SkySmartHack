@@ -19,7 +19,7 @@ class QiwiPayment:
             try:
                 amount = count * self.price
                 lifetime = 10 #минут
-                bill_id = str(uuid.uuid4()) + user_telegram_id
+                bill_id = str(uuid.uuid4()) + "_user_telegram_id:" + user_telegram_id
                 bill: Bill = self.qiwi.bill(bill_id=bill_id, amount=amount, lifetime=lifetime)
                 url = bill.pay_url
                 return True, url, bill_id, count
@@ -41,16 +41,16 @@ class QiwiPayment:
                 return False
             elif status == "PAID":
                 cursor.execute(f"""
-                SELECT * FROM users WHERE telegram_id = {str(user_telegram_id),}
-                """)
+                SELECT * FROM users WHERE telegram_id = ?
+                """, (str(user_telegram_id),))
                 result = cursor.fetchone()
                 if result:
                     try:
                         cursor.execute(f"""
                         UPDATE users SET 
-                        available_answers = available_answers + {count}
-                        WHERE telegram_id = {str(user_telegram_id)}
-                        """)
+                        available_answers = available_answers + ?
+                        WHERE telegram_id = ?
+                        """, (count, str(user_telegram_id)))
                         bot_db.commit()
                         return True
                     except Exception as e:
