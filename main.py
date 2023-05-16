@@ -75,10 +75,11 @@ async def tools(message: types.Message):
 @dp.message_handler(commands=["promo"])
 async def promo(message: types.Message):
     registered = userRegister(message.from_user.id)
-    is_trusted = isUserTrustedPerson(message.from_user.id)
-    if registered and is_trusted:
+    if registered:
         await message.answer("🔑 Отлично! Теперь введи промокод")
         await ActivatePromo.promocode.set()
+    else:
+        await message.answer("❌ Что-то пошло не так при выполнении команды!")
 @dp.message_handler(state=ActivatePromo.promocode)
 async def process_promo_body(message: types.Message, state: FSMContext):
     await state.finish()
