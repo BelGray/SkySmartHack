@@ -1,5 +1,7 @@
 import sqlite3
+import traceback
 
+from skysmarthack.logger import logAction
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 import skysmarthack.buttons
@@ -54,6 +56,7 @@ async def on_startup(dispatcher):
 
 @dp.message_handler(commands=["tools"])
 async def tools(message: types.Message):
+    await logAction(tools, True, message)
     registered = userRegister(message.from_user.id)
     is_trusted = isUserTrustedPerson(message.from_user.id)
     if registered:
@@ -74,6 +77,7 @@ async def tools(message: types.Message):
 
 @dp.message_handler(commands=["promo"])
 async def promo(message: types.Message):
+    await logAction(promo, True, message)
     registered = userRegister(message.from_user.id)
     if registered:
         await message.answer("🔑 Отлично! Теперь введи промокод")
@@ -82,6 +86,7 @@ async def promo(message: types.Message):
         await message.answer("❌ Что-то пошло не так при выполнении команды!")
 @dp.message_handler(state=ActivatePromo.promocode)
 async def process_promo_body(message: types.Message, state: FSMContext):
+    await logAction(process_promo_body, True, message)
     await state.finish()
     full_promocode = message.text
     parts = full_promocode.split("-")
@@ -101,6 +106,7 @@ async def process_promo_body(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text="activate_promo_button")
 async def activate_promo_callback(message: types.Message):
+    await logAction(activate_promo_callback, True, message)
     text = message["message"]["text"]
     full_promo_splitting = text.split("|")
     full_promo = full_promo_splitting[1]
@@ -113,6 +119,7 @@ async def activate_promo_callback(message: types.Message):
 
 @dp.callback_query_handler(text="delete_promo")
 async def delete_promo_callback(message: types.Message):
+    await logAction(delete_promo_callback, True, message)
     registered = userRegister(message.from_user.id)
     is_trusted = isUserTrustedPerson(message.from_user.id)
     if registered and is_trusted:
@@ -121,6 +128,7 @@ async def delete_promo_callback(message: types.Message):
 
 @dp.message_handler(state=DeletePromo.id)
 async def process_promo_id(message: types.Message, state: FSMContext):
+    await logAction(process_promo_id, True, message)
     await state.finish()
     try:
         int(message.text)
@@ -134,6 +142,7 @@ async def process_promo_id(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(text="create_promo")
 async def create_promo_callback(message: types.Message):
+    await logAction(create_promo_callback, True, message)
     registered = userRegister(message.from_user.id)
     is_trusted = isUserTrustedPerson(message.from_user.id)
     if registered and is_trusted:
@@ -143,6 +152,7 @@ async def create_promo_callback(message: types.Message):
 
 @dp.message_handler(state=NewPromo.body)
 async def process_promo_body(message: types.Message, state: FSMContext):
+    await logAction(process_promo_body, True, message)
     await state.finish()
     text = message.text
     split_promo = text.split("-")
@@ -163,6 +173,7 @@ async def process_promo_body(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=["profile"])
 async def profile(message: types.Message):
+    await logAction(profile, True, message)
     registered = userRegister(message.from_user.id)
     cursor.execute("SELECT available_answers FROM users WHERE telegram_id = ?", (str(message.from_user.id),))
     result = cursor.fetchone()
@@ -179,6 +190,7 @@ async def profile(message: types.Message):
 
 @dp.message_handler(commands=["start"])
 async def start(message: types.Message):
+    await logAction(start, True, message)
     text = f"""🔹 SkySmartHack - это бот, который даст тебе ответы на любой тест платформы SkySmart. Просто отправь боту ссылку на тест, чтобы получить их.
 
 📺 Официальный телеграм-канал бота: https://t.me/skysmarthack
@@ -193,6 +205,7 @@ async def start(message: types.Message):
 
 @dp.message_handler()
 async def message_handler(message: types.Message):
+    await logAction(message_handler, True, message)
     hash_url = SSApi.cut_hash(message["text"])
     user_register = userRegister(str(message.from_user.id))
     if hash_url[0] and user_register:
@@ -216,7 +229,8 @@ async def message_handler(message: types.Message):
 
 
 @dp.callback_query_handler(text="get_answers_button")
-async def get_answers(message: types.Message):
+async def get_answers_callback(message: types.Message):
+    await logAction(get_answers_callback, True, message)
     chat_id = message["message"]["chat"]["id"]
     message_content = message["message"]["text"]
     hash_url = (True, message_content[-10:])
