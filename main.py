@@ -1,6 +1,8 @@
 import sqlite3
 import traceback
 
+import secret
+import systems.pay
 from skysmarthack.logger import logAction
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -53,6 +55,210 @@ async def on_startup(dispatcher):
         print(e)
     print("ПОДКЛЮЧЕНИЕ К TELEGRAM API СОВЕРШЕНО УСПЕШНО")
     await set_default_commands(dispatcher)
+
+@dp.message_handler(commands=['buy_answers'])
+async def buy_answers(message: types.Message):
+    await logAction(buy_answers, True, message)
+    registered = userRegister(message.from_user.id)
+    if registered:
+        text = f"""💳 <b>Купить ответы на тесты</b>
+
+📌 10 ответов - 30₽
+📌 25 ответов - 70₽ [-7%]
+📌 50 ответов - 130₽ [-14%]
+📌 75 ответов - 180₽ [-20%]
+📌 100 ответов - 225₽ [-25%]"""
+        await message.answer(text, parse_mode="HTML", reply_markup=skysmarthack.buttons.BuyAnswersButtonClient)
+    else:
+        await message.answer("⭕ Что-то пошло не так! Повтори попытку позже!")
+
+@dp.callback_query_handler(text="buy_100_answers")
+async def buy_100_answers_callback(message: types.Message):
+    await logAction(buy_100_answers_callback, True, message)
+    qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
+    count = 100
+    amount = 225
+    lifetime = 120
+    chat_id = message["message"]["chat"]["id"]
+    bill = await qiwi.buildBill(
+        str(message.from_user.id),
+        count = count,
+        amount = amount,
+        comment=f"{count} {'ответ(-а)' if count < 5 else 'ответов'} на тесты платформы SkySmart в телеграм-боте @skysmarthack_bot.\n\nTG-ID покупателя: {message.from_user.id}",
+        bill_lifetime=lifetime
+    )
+    if bill[0]:
+        PayBillButtonClient = InlineKeyboardMarkup(2)
+        pay_bill_button = InlineKeyboardButton(text="🥝 Оплатить через QIWI", url=bill[1])
+        PayBillButtonClient.insert(pay_bill_button)
+        await bot.send_message(chat_id=chat_id, text=f"""💳 <b>Счет к оплате</b>
+
+🎁 <b>Товар:</b> {count} ответов
+💲 <b>Стоимость:</b> {amount}₽
+🕓 <b>Время действия счета:</b> {lifetime} мин.
+""", parse_mode="HTML", reply_markup=PayBillButtonClient)
+        wait_for_pay = await qiwi.waitForPay(str(message.from_user.id), bill_id=bill[2], count=count)
+        if wait_for_pay:
+            await bot.send_message(chat_id=chat_id, text=f"✅ Оплата прошла успешно! На твой баланс зачислено <b>{count} {'ответ(-а)' if count < 5 else 'ответов'}</b>. Проверить - /profile", parse_mode="HTML")
+        else:
+            await bot.send_message(
+                chat_id = chat_id,
+                text=f"❌ Что-то пошло не так при оплате счета. Возможно, у него истек срок."
+            )
+
+    else:
+        await message.answer("⭕ Что-то пошло не так при конструировании счета! Повтори попытку позже!")
+
+@dp.callback_query_handler(text="buy_75_answers")
+async def buy_75_answers_callback(message: types.Message):
+    await logAction(buy_75_answers_callback, True, message)
+    qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
+    count = 75
+    amount = 180
+    lifetime = 120
+    chat_id = message["message"]["chat"]["id"]
+    bill = await qiwi.buildBill(
+        str(message.from_user.id),
+        count = count,
+        amount = amount,
+        comment=f"{count} {'ответ(-а)' if count < 5 else 'ответов'} на тесты платформы SkySmart в телеграм-боте @skysmarthack_bot.\n\nTG-ID покупателя: {message.from_user.id}",
+        bill_lifetime=lifetime
+    )
+    if bill[0]:
+        PayBillButtonClient = InlineKeyboardMarkup(2)
+        pay_bill_button = InlineKeyboardButton(text="🥝 Оплатить через QIWI", url=bill[1])
+        PayBillButtonClient.insert(pay_bill_button)
+        await bot.send_message(chat_id=chat_id, text=f"""💳 <b>Счет к оплате</b>
+
+🎁 <b>Товар:</b> {count} ответов
+💲 <b>Стоимость:</b> {amount}₽
+🕓 <b>Время действия счета:</b> {lifetime} мин.
+""", parse_mode="HTML", reply_markup=PayBillButtonClient)
+        wait_for_pay = await qiwi.waitForPay(str(message.from_user.id), bill_id=bill[2], count=count)
+        if wait_for_pay:
+            await bot.send_message(chat_id=chat_id, text=f"✅ Оплата прошла успешно! На твой баланс зачислено <b>{count} {'ответ(-а)' if count < 5 else 'ответов'}</b>. Проверить - /profile", parse_mode="HTML")
+        else:
+            await bot.send_message(
+                chat_id = chat_id,
+                text=f"❌ Что-то пошло не так при оплате счета. Возможно, у него истек срок."
+            )
+
+    else:
+        await message.answer("⭕ Что-то пошло не так при конструировании счета! Повтори попытку позже!")
+
+
+@dp.callback_query_handler(text="buy_50_answers")
+async def buy_50_answers_callback(message: types.Message):
+    await logAction(buy_50_answers_callback, True, message)
+    qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
+    count = 50
+    amount = 130
+    lifetime = 120
+    chat_id = message["message"]["chat"]["id"]
+    bill = await qiwi.buildBill(
+        str(message.from_user.id),
+        count = count,
+        amount = amount,
+        comment=f"{count} {'ответ(-а)' if count < 5 else 'ответов'} на тесты платформы SkySmart в телеграм-боте @skysmarthack_bot.\n\nTG-ID покупателя: {message.from_user.id}",
+        bill_lifetime=lifetime
+    )
+    if bill[0]:
+        PayBillButtonClient = InlineKeyboardMarkup(2)
+        pay_bill_button = InlineKeyboardButton(text="🥝 Оплатить через QIWI", url=bill[1])
+        PayBillButtonClient.insert(pay_bill_button)
+        await bot.send_message(chat_id=chat_id, text=f"""💳 <b>Счет к оплате</b>
+
+🎁 <b>Товар:</b> {count} ответов
+💲 <b>Стоимость:</b> {amount}₽
+🕓 <b>Время действия счета:</b> {lifetime} мин.
+""", parse_mode="HTML", reply_markup=PayBillButtonClient)
+        wait_for_pay = await qiwi.waitForPay(str(message.from_user.id), bill_id=bill[2], count=count)
+        if wait_for_pay:
+            await bot.send_message(chat_id=chat_id, text=f"✅ Оплата прошла успешно! На твой баланс зачислено <b>{count} {'ответ(-а)' if count < 5 else 'ответов'}</b>. Проверить - /profile", parse_mode="HTML")
+        else:
+            await bot.send_message(
+                chat_id = chat_id,
+                text=f"❌ Что-то пошло не так при оплате счета. Возможно, у него истек срок."
+            )
+
+    else:
+        await message.answer("⭕ Что-то пошло не так при конструировании счета! Повтори попытку позже!")
+
+@dp.callback_query_handler(text="buy_25_answers")
+async def buy_25_answers_callback(message: types.Message):
+    await logAction(buy_25_answers_callback, True, message)
+    qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
+    count = 25
+    amount = 70
+    lifetime = 120
+    chat_id = message["message"]["chat"]["id"]
+    bill = await qiwi.buildBill(
+        str(message.from_user.id),
+        count = count,
+        amount = amount,
+        comment=f"{count} {'ответ(-а)' if count < 5 else 'ответов'} на тесты платформы SkySmart в телеграм-боте @skysmarthack_bot.\n\nTG-ID покупателя: {message.from_user.id}",
+        bill_lifetime=lifetime
+    )
+    if bill[0]:
+        PayBillButtonClient = InlineKeyboardMarkup(2)
+        pay_bill_button = InlineKeyboardButton(text="🥝 Оплатить через QIWI", url=bill[1])
+        PayBillButtonClient.insert(pay_bill_button)
+        await bot.send_message(chat_id=chat_id, text=f"""💳 <b>Счет к оплате</b>
+
+🎁 <b>Товар:</b> {count} ответов
+💲 <b>Стоимость:</b> {amount}₽
+🕓 <b>Время действия счета:</b> {lifetime} мин.
+""", parse_mode="HTML", reply_markup=PayBillButtonClient)
+        wait_for_pay = await qiwi.waitForPay(str(message.from_user.id), bill_id=bill[2], count=count)
+        if wait_for_pay:
+            await bot.send_message(chat_id=chat_id, text=f"✅ Оплата прошла успешно! На твой баланс зачислено <b>{count} {'ответ(-а)' if count < 5 else 'ответов'}</b>. Проверить - /profile", parse_mode="HTML")
+        else:
+            await bot.send_message(
+                chat_id = chat_id,
+                text=f"❌ Что-то пошло не так при оплате счета. Возможно, у него истек срок."
+            )
+
+    else:
+        await message.answer("⭕ Что-то пошло не так при конструировании счета! Повтори попытку позже!")
+
+@dp.callback_query_handler(text="buy_10_answers")
+async def buy_10_answers_callback(message: types.Message):
+    await logAction(buy_10_answers_callback, True, message)
+    qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
+    count = 10
+    amount = 30
+    lifetime = 120
+    chat_id = message["message"]["chat"]["id"]
+    bill = await qiwi.buildBill(
+        str(message.from_user.id),
+        count = count,
+        amount = amount,
+        comment=f"{count} {'ответ(-а)' if count < 5 else 'ответов'} на тесты платформы SkySmart в телеграм-боте @skysmarthack_bot.\n\nTG-ID покупателя: {message.from_user.id}",
+        bill_lifetime=lifetime
+    )
+    if bill[0]:
+        PayBillButtonClient = InlineKeyboardMarkup(2)
+        pay_bill_button = InlineKeyboardButton(text="🥝 Оплатить через QIWI", url=bill[1])
+        PayBillButtonClient.insert(pay_bill_button)
+        await bot.send_message(chat_id=chat_id, text=f"""💳 <b>Счет к оплате</b>
+
+🎁 <b>Товар:</b> {count} ответов
+💲 <b>Стоимость:</b> {amount}₽
+🕓 <b>Время действия счета:</b> {lifetime} мин.
+""", parse_mode="HTML", reply_markup=PayBillButtonClient)
+        wait_for_pay = await qiwi.waitForPay(str(message.from_user.id), bill_id=bill[2], count=count)
+        if wait_for_pay:
+            await bot.send_message(chat_id=chat_id, text=f"✅ Оплата прошла успешно! На твой баланс зачислено <b>{count} {'ответ(-а)' if count < 5 else 'ответов'}</b>. Проверить - /profile", parse_mode="HTML")
+        else:
+            await bot.send_message(
+                chat_id = chat_id,
+                text=f"❌ Что-то пошло не так при оплате счета. Возможно, у него истек срок."
+            )
+
+    else:
+        await message.answer("⭕ Что-то пошло не так при конструировании счета! Повтори попытку позже!")
+
+
 
 @dp.message_handler(commands=["tools"])
 async def tools(message: types.Message):

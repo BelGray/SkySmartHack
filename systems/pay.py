@@ -7,21 +7,27 @@ from systems.tool_methods import *
 from pyqiwip2p import QiwiP2P
 
 class QiwiPayment:
-    def __init__(self, qiwi_token, price):
+    def __init__(self, qiwi_token):
         self.qiwi_token = qiwi_token
-        self.price = price
         self.qiwi = QiwiP2P(auth_key=self.qiwi_token)
 
-    def buildBill(self, user_telegram_id: str, count: int) -> tuple:
+    async def buildBill(self, user_telegram_id: str, count: int, amount: int, comment: str, bill_lifetime) -> tuple:
         """Сконструировать счёт"""
         register = userRegister(user_telegram_id)
         if register:
             try:
-                amount = count * self.price
-                lifetime = 10 #минут
-                bill_id = str(uuid.uuid4()) + "_user_telegram_id:" + user_telegram_id
-                bill: Bill = self.qiwi.bill(bill_id=bill_id, amount=amount, lifetime=lifetime)
+                lifetime = bill_lifetime #минут
+                bill_id = str(uuid.uuid4()) + "_user_telegram_id:" + user_telegram_id + "_skysmarthack"
+                bill: Bill = self.qiwi.bill(bill_id=bill_id, amount=amount, lifetime=lifetime, comment=comment)
                 url = bill.pay_url
+                print(f"""----------------------------------------------
+Создан счет на оплату QIWI
+
+ID пользователя: {user_telegram_id}
+Сумма: {amount} руб.
+Срок: {lifetime} мин.
+ID счета: {bill_id}
+URL счета: {url}""")
                 return True, url, bill_id, count
 
             except Exception as e:
