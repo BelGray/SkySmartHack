@@ -19,6 +19,7 @@ from skysmarthack.loader import dp, bot
 from skysmarthack.bot_commands import set_default_commands, commands_list
 
 SSApi = SkySmartApi(skysmart_token)
+bills_lifetime = 5
 
 class DeletePromo(StatesGroup):
     id = State()
@@ -78,7 +79,7 @@ async def buy_100_answers_callback(message: types.Message):
     qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
     count = 100
     amount = 225
-    lifetime = 120
+    lifetime = bills_lifetime
     chat_id = message["message"]["chat"]["id"]
     bill = await qiwi.buildBill(
         str(message.from_user.id),
@@ -115,7 +116,7 @@ async def buy_75_answers_callback(message: types.Message):
     qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
     count = 75
     amount = 180
-    lifetime = 120
+    lifetime = bills_lifetime
     chat_id = message["message"]["chat"]["id"]
     bill = await qiwi.buildBill(
         str(message.from_user.id),
@@ -153,7 +154,7 @@ async def buy_50_answers_callback(message: types.Message):
     qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
     count = 50
     amount = 130
-    lifetime = 120
+    lifetime = bills_lifetime
     chat_id = message["message"]["chat"]["id"]
     bill = await qiwi.buildBill(
         str(message.from_user.id),
@@ -190,7 +191,7 @@ async def buy_25_answers_callback(message: types.Message):
     qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
     count = 25
     amount = 70
-    lifetime = 120
+    lifetime = bills_lifetime
     chat_id = message["message"]["chat"]["id"]
     bill = await qiwi.buildBill(
         str(message.from_user.id),
@@ -227,7 +228,7 @@ async def buy_10_answers_callback(message: types.Message):
     qiwi = systems.pay.QiwiPayment(secret.qiwi_secret_data["api_belgray_key"])
     count = 10
     amount = 30
-    lifetime = 120
+    lifetime = bills_lifetime
     chat_id = message["message"]["chat"]["id"]
     bill = await qiwi.buildBill(
         str(message.from_user.id),
