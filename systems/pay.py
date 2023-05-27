@@ -44,6 +44,11 @@ URL счета: {url}""")
             status = self.qiwi.check(bill_id=bill_id).status
             if status == "EXPIRED":
                 self.qiwi.reject(bill_id=bill_id)
+                print(f"""----------------------------------------------
+🕓 У счета истек срок!
+
+ID счета: {bill_id}
+ID пользователя: {user_telegram_id}""")
                 return False
             elif status == "PAID":
                 cursor.execute(f"""
@@ -58,9 +63,20 @@ URL счета: {url}""")
                         WHERE telegram_id = ?
                         """, (count, str(user_telegram_id)))
                         bot_db.commit()
+                        print(f"""----------------------------------------------
+✅ Счет успешно оплачен! Товар выдан: {count} ответов
+
+ID пользователя: {user_telegram_id}
+ID счета: {bill_id}
+""")
                         return True
                     except Exception as e:
-                        print(e)
+                        print(f"""----------------------------------------------
+❌ ОШИБКА ПРИ ВЫДАЧЕ ТОВАРА ПОЛЬЗОВАТЕЛЮ! Не выдан товар: {count} ответов
+
+ID пользователя: {user_telegram_id}
+ID счета: {bill_id}
+Ошибка: {e}""")
                         return False
                 else:
                     return False
