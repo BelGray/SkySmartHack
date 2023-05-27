@@ -12,13 +12,14 @@ class SkySmartApi:
     def headers(self):
         """Сгенерировать headers для HTTP-запроса"""
         user_agent = u_ag.generate_user_agent()
-        return {
+        headers = {
             'Accept': 'application/json, text/plain, */*',
             'Authorization': 'Bearer ' + self.bearer_token,
             'Connection': 'keep-alive',
             'Content-Type': 'application/json',
             'User-Agent': user_agent,
         }
+        return headers
 
     def get_tasks(self, taskHash):
         """Получить UUID всех заданий в тесте"""
