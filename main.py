@@ -27,6 +27,8 @@ class ActivatePromo(StatesGroup):
     promocode = State()
 class NewPromo(StatesGroup):
     body = State()
+class PromoInfo(StatesGroup):
+    id = State()
 
 
 #Подключение к Telegram API
@@ -273,11 +275,19 @@ async def tools(message: types.Message):
 
 Панель управления для разработчиков и доверенных пользователей.
 
-Промокод: {id}-{body}-{item_id}
-Создать новый промокод: {body}-{description}-{item_id}-{usages}
+Строение промокодов: <code>{id}-{body}-{item_id}</code>
+Создать новый промокод: <code>{body}-{description}-{item_id}-{usages}</code>
 """, parse_mode="HTML", reply_markup=skysmarthack.buttons.ToolsMenuButtonClient)
         else:
-            await message.answer("⭕ Команда доступна только разработчикам бота и доверенным пользователям!")
+            await message.answer("""
+⚙️ <b>Панель управления ботом</b>
+
+Панель управления для разработчиков и доверенных пользователей.
+
+Строение промокодов: <code>{id}-{body}-{item_id}</code>
+
+❌ <u>Вы не являетесь разработчиком бота или доверенным пользователем, поэтому функционал команды ограничен!</u>""",
+            parse_mode="HTML", reply_markup=skysmarthack.buttons.ToolsNotForTrustedMenuButtonClient)
     else:
         await message.answer("⭕ Что-то пошло не так! Повтори попытку позже!")
 
@@ -355,6 +365,40 @@ async def create_promo_callback(message: types.Message):
     if registered and is_trusted:
         await message.answer("🔏 Введите новый промокод в формате body-description-item_id-usages ")
         await NewPromo.body.set()
+
+@dp.callback_query_handler(text="promo_info")
+async def promo_info_callback(message: types.Message):
+    await logAction(promo_info_callback, True, message)
+    register = userRegister(message.from_user.id)
+    if register:
+        await message.answer("🔏 Введите ID промокода")
+        await PromoInfo.id.set()
+
+
+@dp.message_handler(state=PromoInfo.id)
+async def process_promo_info_id(message: types.Message, state: FSMContext):
+    await logAction(process_promo_info_id, True, message)
+    await state.finish()
+    try:
+        int(promo_id := message.text)
+    except:
+        return await message.answer(text=f"<b>Значение ID должно быть целочисленным!</b>", parse_mode="HTML")
+    fetch_promo = promocode.Promo.promo_info_by_id(promo_id)
+    if fetch_promo[0]:
+        id, body, description, item_id, usages = fetch_promo[1]
+        await message.answer(f"""🗝️ <b>Информация о промокоде с ID: {promo_id}</b>
+
+<code>- promo (SQL table) -
+[0] id: {id}
+[1] body: {body}
+[2] description: {description}
+[3] item_id: {item_id}
+[4] usages: {usages}</code>
+
+Собранный промокод: <b>{id}-{body}-{item_id}</b>""", parse_mode="HTML")
+    else:
+        await message.answer(text=f"<b>Промокода с данным ID не существует!</b>", parse_mode="HTML")
+
 
 
 @dp.message_handler(state=NewPromo.body)
