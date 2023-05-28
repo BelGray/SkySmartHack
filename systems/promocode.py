@@ -54,6 +54,20 @@ class Promo:
             print("user is not trusted")
             return False, None
 
+    def promo_info_by_id(id):
+        """Получить информацию о промокоде по ID в базе данных"""
+        try:
+            cursor.execute(f"SELECT * FROM promo WHERE id = ?", (id,))
+            result = cursor.fetchone()
+            if result:
+                return True, result
+            else:
+                print(f"promo with ID: {id} is not found")
+                return False, None
+        except Exception as e:
+            print(e)
+            return False, None
+
 class AlreadyExistsPromo:
 
         item_ids = {
