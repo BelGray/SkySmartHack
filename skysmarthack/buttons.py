@@ -7,7 +7,7 @@ ActivatePromoButtonClient = InlineKeyboardMarkup(row_width=2)
 
 activate_promo_button = InlineKeyboardButton(text="✔️ Активировать", callback_data="activate_promo_button")
 get_answers_button = InlineKeyboardButton(text="📌 Получить ответы", callback_data="get_answers_button")
-promo_info = InlineKeyboardButton(text="ℹ️ Информация и промокоде", callback_data="promo_info")
+promo_info = InlineKeyboardButton(text="ℹ️ Информация о промокоде", callback_data="promo_info")
 create_promo = InlineKeyboardButton(text="🆕 Создать промокод", callback_data="create_promo")
 delete_promo = InlineKeyboardButton(text="🗑️ Удалить промокод", callback_data="delete_promo")
 
