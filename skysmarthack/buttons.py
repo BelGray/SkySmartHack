@@ -1,13 +1,15 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 ButtonClient = InlineKeyboardMarkup(row_width=2)
+ToolsNotForTrustedMenuButtonClient = InlineKeyboardMarkup(row_width=2)
 ToolsMenuButtonClient = InlineKeyboardMarkup(row_width=2)
 ActivatePromoButtonClient = InlineKeyboardMarkup(row_width=2)
 
 activate_promo_button = InlineKeyboardButton(text="✔️ Активировать", callback_data="activate_promo_button")
 get_answers_button = InlineKeyboardButton(text="📌 Получить ответы", callback_data="get_answers_button")
-create_promo = InlineKeyboardButton(text="Создать промокод", callback_data="create_promo")
-delete_promo = InlineKeyboardButton(text="Удалить промокод", callback_data="delete_promo")
+promo_info = InlineKeyboardButton(text="ℹ️ Информация и промокоде", callback_data="promo_info")
+create_promo = InlineKeyboardButton(text="🆕 Создать промокод", callback_data="create_promo")
+delete_promo = InlineKeyboardButton(text="🗑️ Удалить промокод", callback_data="delete_promo")
 
 BuyAnswersButtonClient = InlineKeyboardMarkup(row_width=2)
 buy_10_answers = InlineKeyboardButton(text="10 ответов", callback_data="buy_10_answers")
@@ -20,9 +22,11 @@ BuyAnswersButtonClient.insert(buy_25_answers)
 BuyAnswersButtonClient.insert(buy_50_answers)
 BuyAnswersButtonClient.insert(buy_75_answers)
 BuyAnswersButtonClient.insert(buy_100_answers)
+ToolsNotForTrustedMenuButtonClient.insert(promo_info)
 
 ToolsMenuButtonClient.insert(create_promo)
 ToolsMenuButtonClient.insert(delete_promo)
+ToolsMenuButtonClient.insert(promo_info)
 
 ActivatePromoButtonClient.insert(activate_promo_button)
 
